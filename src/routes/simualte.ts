@@ -4,6 +4,7 @@ import comulateProp from "../utils/comulateProp";
 import { fillProbabilities } from "../utils/fillProbabilities";
 import { parseUsers } from "../utils/parceUsers";
 import setFormatedTime from "../utils/setFormatedTime";
+import setLookupV1 from "../utils/setLookupV1";
 import simulateV1, { UserRow } from "../utils/simulateV1";
 import { UserRow as UserRowV2 } from "../utils/simulateV2";
 import { simualtionV1VSchema } from "../validation/simualteV1Valid";
@@ -13,12 +14,12 @@ export const simulateRoute = new Hono()
   .basePath("/simulate")
   .post("/v1", zValidator("json", simualtionV1VSchema), (c) => {
     try {
-      const { table, startTime } = c.req.valid("json");
+      const { table, arrivals, services, startTime } = c.req.valid("json");
       const simulationHeaders = [
         "CLIENT_ID",
         "INTERARRIVAL_TIME",
-        "ISSUE_CODE",
         "ARRIVAL_TIME",
+        "ISSUE_CODE",
         "ISSUE",
         "TIME_SER_BEG",
         "SERVICE_TIME",
@@ -26,7 +27,8 @@ export const simulateRoute = new Hono()
         "CUST_STATE",
         "SYSTEM_STATE",
       ];
-      const parsedUsers = parseUsers(table, simulationHeaders) as UserRow[];
+      let parsedUsers = parseUsers(table, simulationHeaders) as UserRow[];
+      parsedUsers = setLookupV1(parsedUsers, arrivals, services);
       const simulatedTable = simulateV1(parsedUsers);
       const formatedTable = setFormatedTime(simulatedTable, startTime);
       return c.json({
@@ -54,6 +56,7 @@ export const simulateRoute = new Hono()
       const parsedUsers = parseUsers(table, simulationHeaders) as UserRowV2[];
       const comArrivals = comulateProp(arrivals);
       const comServices = comulateProp(services);
+      // version 2 specific code
       const filledUsers = fillProbabilities(
         comServices,
         comArrivals,

@@ -7,7 +7,7 @@ const app = new Hono();
 app.use("*", logger());
 app.route("/api", simulateRoute);
 app.use(
-  "/client/*",
+  "*",
   serveStatic({
     root: "/client/dist",
     manifest: {},

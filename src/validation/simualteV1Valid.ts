@@ -7,6 +7,8 @@ export const cellVSchema = z.object({
 });
 export const rowVSchema = z.array(cellVSchema);
 export const simualtionV1VSchema = z.object({
-  table: z.array(rowVSchema),
+  arrivals: z.array(rowVSchema),
+  services: z.array(rowVSchema),
   startTime: cellVSchema,
+  table: z.array(rowVSchema),
 });
