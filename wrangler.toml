@@ -1,0 +1,28 @@
+name = "event-driven-systems"
+main = "src/index.ts"
+compatibility_date = "2024-11-28"
+
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./client/dist"
+
+# Uncomment and configure the following sections as needed:
+# [vars]
+# MY_VAR = "my-variable"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "my-database"
+# database_id = ""
+
+# [ai]
+# binding = "AI"
