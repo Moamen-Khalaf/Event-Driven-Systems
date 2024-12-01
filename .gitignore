@@ -1,13 +1,13 @@
 # prod
 dist/
 # Ignore everything in the client folder
-client/**
+client/node_modules/
 
 # Do not ignore the dist folder inside client
-!client/dist/
+client/dist/
 
 # Ensure all contents of dist are included
-!client/dist/**
+client/dist/**
 
 # dev
 .yarn/
