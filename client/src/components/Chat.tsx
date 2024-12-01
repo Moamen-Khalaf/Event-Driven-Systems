@@ -73,7 +73,7 @@ function scrollToBottom(element: RefObject<HTMLDivElement>) {
   }, 0);
 }
 
-export default function Chat() {
+export default function Chat({ className }: { className?: string }) {
   const messages = useCurrentChatStore((state) => state.messages);
   const chatElement = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -89,10 +89,7 @@ export default function Chat() {
   }, []);
 
   return (
-    <ScrollArea
-      className="grow mx-2 md:mx-12 h-[50vh] flex gap-4 flex-col px-4 overflow-auto relative"
-      ref={chatElement}
-    >
+    <ScrollArea className={className} ref={chatElement}>
       {messages.map((message, key) =>
         message.role === "system" ? null : message.role === "user" ? (
           <UserMessage message={message.content} key={key} />
