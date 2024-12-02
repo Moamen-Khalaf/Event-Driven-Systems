@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-type CellType = {
+export type CellType = {
   v: string | number;
   f: string;
   pos: string;

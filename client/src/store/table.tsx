@@ -13,8 +13,10 @@ interface TableProps {
   table: CellType[][];
   setSelectedCell: (cell: CellType) => void;
   setTable: (table: CellType[][]) => void;
+  clearTable: () => void;
+  getCopy: () => string;
 }
-const defaultTable = Array.from({ length: 40 }, (_, r) =>
+const defaultTable = Array.from({ length: 30 }, (_, r) =>
   Array.from({ length: 40 }, (_, c) => ({
     v: "",
     f: "",
@@ -23,7 +25,7 @@ const defaultTable = Array.from({ length: 40 }, (_, r) =>
 );
 const defaultCell = { v: "", f: "", pos: "" };
 export const useTable = create<TableProps>()(
-  immer((set) => ({
+  immer((set, get) => ({
     selectedCell: defaultCell,
     table: defaultTable,
     setSelectedCell: (cell) =>
@@ -39,5 +41,12 @@ export const useTable = create<TableProps>()(
           })
         );
       }),
+    clearTable: () =>
+      set((state) => {
+        state.table = defaultTable;
+        state.selectedCell = defaultCell;
+      }),
+    getCopy: () =>
+      JSON.stringify(get().table.map((row) => row.map((cell) => cell.v))),
   }))
 );
