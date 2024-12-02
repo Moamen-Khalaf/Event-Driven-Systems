@@ -1,7 +1,7 @@
 import { useCurrentChatStore } from "@/store/curretChat";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Copy, Pencil } from "lucide-react";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { memo, useEffect, useRef, useState, type RefObject } from "react";
 import ReactMarkdown from "react-markdown";
 
 function UserMessage({ message }: { message: string }) {
@@ -12,7 +12,7 @@ function UserMessage({ message }: { message: string }) {
       onMouseOver={() => setEdit(true)}
       onMouseLeave={() => setEdit(false)}
     >
-      <div className="bg-sidebar w-fit p-4 rounded-lg md:max-w-[80%]">
+      <div className="bg-sidebar w-fit p-4 rounded-lg md:max-w-[90%]">
         {message}
       </div>
       {edit && (
@@ -52,7 +52,7 @@ function AssistantMessage({
   }, [animate, message]);
   return (
     <div className="flex w-full flex-col">
-      <div className="p-2 rounded-lg prose text-foreground  md:max-w-[80%]">
+      <div className="p-2 rounded-lg prose text-foreground  md:max-w-[90%]">
         <ReactMarkdown>{visibleText}</ReactMarkdown>
       </div>
       <Copy
@@ -73,7 +73,7 @@ function scrollToBottom(element: RefObject<HTMLDivElement>) {
   }, 0);
 }
 
-export default function Chat({ className }: { className?: string }) {
+function Chat({ className }: { className?: string }) {
   const messages = useCurrentChatStore((state) => state.messages);
   const chatElement = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -106,3 +106,5 @@ export default function Chat({ className }: { className?: string }) {
     </ScrollArea>
   );
 }
+
+export default memo(Chat);

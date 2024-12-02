@@ -8,12 +8,32 @@ import {
   ResizablePanelGroup,
 } from "./components/ui/resizable";
 import Table from "./components/simulation/Table";
-const table = Array.from({ length: 100 }, () =>
-  Array.from({ length: 100 }, () => "")
-);
+
+function ChatSection() {
+  return (
+    <ResizablePanel
+      defaultSize={100}
+      minSize={50}
+      className="flex flex-col gap-2"
+    >
+      <Chat className="grow ml-2 md:ml-12 h-[50vh] flex gap-4 flex-col px-4 overflow-auto pt-10" />
+      <div className="mx-2 md:mx-12 flex place-content-center">
+        <ChatInput />
+      </div>
+    </ResizablePanel>
+  );
+}
+
+function TableSection() {
+  return (
+    <ResizablePanel collapsedSize={0}>
+      <Table />
+    </ResizablePanel>
+  );
+}
+
 function App() {
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 640);
-
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 640);
@@ -26,26 +46,15 @@ function App() {
     };
   }, []);
   return (
-    <div className="bg-secondary min-h-[100vh]">
+    <div className="bg-secondary h-[100vh] overflow-hidden">
       <Layout>
         <ResizablePanelGroup
           direction={isSmallScreen ? "vertical" : "horizontal"}
           className="w-[50vh]"
         >
-          <ResizablePanel
-            defaultSize={100}
-            minSize={50}
-            className="flex flex-col gap-2"
-          >
-            <Chat className="grow mx-2 md:mx-12 h-[50vh] flex gap-4 flex-col px-4 overflow-auto pt-10" />
-            <div className="mx-2 md:mx-12 flex place-content-center">
-              <ChatInput />
-            </div>
-          </ResizablePanel>
+          <ChatSection />
           <ResizableHandle withHandle className="bg-sidebar-foreground" />
-          <ResizablePanel>
-            <Table table={table} />
-          </ResizablePanel>
+          <TableSection />
         </ResizablePanelGroup>
       </Layout>
     </div>
@@ -53,24 +62,3 @@ function App() {
 }
 
 export default App;
-
-/**
- <ResizablePanelGroup
-          direction={isSmallScreen ? "vertical" : "horizontal"}
-        >
-          <ResizablePanel
-            defaultSize={100}
-            minSize={50}
-            className="flex flex-col gap-2 w-full h-full"
-          >
-            <Chat className="grow mx-2 md:mx-12 h-[50vh] flex gap-4 flex-col px-4 overflow-auto pt-10" />
-            <div className="mx-2 md:mx-12 flex place-content-center">
-              <ChatInput />
-            </div>
-          </ResizablePanel>
-          <ResizableHandle withHandle className="bg-sidebar-foreground" />
-          <ResizablePanel>
-            <Table table={table} />
-          </ResizablePanel>
-        </ResizablePanelGroup>
- */
