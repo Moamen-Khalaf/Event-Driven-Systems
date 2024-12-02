@@ -13,7 +13,7 @@ function ChatSection() {
   return (
     <ResizablePanel
       defaultSize={100}
-      minSize={50}
+      minSize={35}
       className="flex flex-col gap-2"
     >
       <Chat className="grow ml-2 md:ml-12 h-[50vh] flex gap-4 flex-col px-4 overflow-auto pt-10" />
