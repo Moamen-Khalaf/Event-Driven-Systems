@@ -27,6 +27,7 @@ export default function simulateV1(users: UserRow[], startTime: CellType) {
   // formulas
   lastUser.ARRIVAL_TIME.f = `=TIME(0,${lastUser.INTERARRIVAL_TIME.pos},0)+${startTime.pos}`;
   lastUser.TIME_SER_ENDS.f = `=${lastUser.TIME_SER_BEG.pos}+TIME(0,${lastUser.SERVICE_TIME.pos},0)`;
+  lastUser.SYSTEM_STATE.f = `=${lastUser.INTERARRIVAL_TIME.pos}`;
   users[0] = lastUser;
   for (let i = 1; i < users.length; i++) {
     const user = users[i];
@@ -45,7 +46,7 @@ export default function simulateV1(users: UserRow[], startTime: CellType) {
     // formulas
     user.ARRIVAL_TIME.f = `=${lastUser.ARRIVAL_TIME.pos}+TIME(0,${user.INTERARRIVAL_TIME.pos},0)`;
     user.TIME_SER_BEG.f = `=MAX(${lastUser.TIME_SER_ENDS.pos},${user.ARRIVAL_TIME.pos})`;
-    user.TIME_SER_ENDS.f = `=${user.TIME_SER_BEG.pos}+${user.SERVICE_TIME.pos}`;
+    user.TIME_SER_ENDS.f = `=${user.TIME_SER_BEG.pos}+TIME(0,${user.SERVICE_TIME.pos},0)`;
     user.CUST_STATE.f = `=MINUTE(${user.TIME_SER_BEG.pos}-${user.ARRIVAL_TIME.pos})`;
     user.SYSTEM_STATE.f = `=MINUTE(MAX(0,${user.ARRIVAL_TIME.pos}-${lastUser.TIME_SER_ENDS.pos}))`;
     users[i] = user;
