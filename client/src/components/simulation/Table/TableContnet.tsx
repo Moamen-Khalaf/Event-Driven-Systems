@@ -1,5 +1,5 @@
 import { useTable } from "@/store/table";
-import * as XLSX from "xlsx";
+import { utils } from "xlsx";
 export default function TableContnet() {
   const table = useTable((state) => state.table);
   const seletedCellPos = useTable((state) => state.selectedCell.pos);
@@ -9,8 +9,8 @@ export default function TableContnet() {
       {table.map((_, rowIndex: number) => (
         <tr key={rowIndex}>
           <td
-            className={`border border-gray-400 px-4 py-2 bg-[#2563eb] text-white ${
-              XLSX.utils.decode_cell(seletedCellPos || "").r === rowIndex
+            className={`sticky left-0 border border-gray-400 px-4 py-2 bg-[#2563eb] text-white ${
+              utils.decode_cell(seletedCellPos || "").r === rowIndex
                 ? "bg-[#2d4e94]"
                 : ""
             }`}
@@ -22,7 +22,7 @@ export default function TableContnet() {
               key={cellIndex}
               className={`border border-gray-400 px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis ${
                 seletedCellPos ===
-                XLSX.utils.encode_cell({ c: cellIndex, r: rowIndex })
+                utils.encode_cell({ c: cellIndex, r: rowIndex })
                   ? "bg-[#2d4e94]/50 text-white"
                   : ""
               }`}

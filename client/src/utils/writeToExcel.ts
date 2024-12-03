@@ -1,9 +1,9 @@
-import * as XLSX from "xlsx";
+import { utils, write } from "xlsx";
 import type { CellType } from "./readRawExcelFile";
 
 export const writeToExcel = (data: CellType[][]): Buffer => {
-  const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.aoa_to_sheet(data, {
+  const workbook = utils.book_new();
+  const worksheet = utils.aoa_to_sheet(data, {
     cellDates: true,
     dateNF: "hh:mm:ss AM/PM",
   });
@@ -15,8 +15,8 @@ export const writeToExcel = (data: CellType[][]): Buffer => {
       return cell;
     })
   );
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-  const excelBuffer = XLSX.write(workbook, {
+  utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  const excelBuffer = write(workbook, {
     bookType: "xlsx",
     type: "buffer",
   });

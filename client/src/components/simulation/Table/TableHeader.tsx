@@ -1,5 +1,5 @@
 import { useTable } from "@/store/table";
-import * as XLSX from "xlsx";
+import { utils } from "xlsx";
 function generateColumnHeaders(length: number) {
   const headers = [];
   for (let i = 0; i < length; i++) {
@@ -18,9 +18,9 @@ export function TableHeader() {
   const headerLength = useTable((state) => state.table[0].length);
   return (
     <thead>
-      <tr>
+      <tr className="sticky top-0 z-10">
         <th
-          className={`border border-gray-400 px-4 py-2 bg-[#2563eb] text-white`}
+          className={`sticky left-0 border border-gray-400 px-4 py-2 bg-[#2563eb] text-white`}
           onClick={() =>
             useTable.getState().setSelectedCell({ v: "", f: "", pos: "" })
           }
@@ -32,7 +32,7 @@ export function TableHeader() {
             <th
               key={colIndex}
               className={`border border-gray-400 px-4 py-2 bg-[#2563eb] text-white ${
-                XLSX.utils.decode_cell(seletedCellPos || "").c === colIndex
+                utils.decode_cell(seletedCellPos || "").c === colIndex
                   ? "bg-[#2d4e94]"
                   : ""
               }`}

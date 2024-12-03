@@ -1,5 +1,5 @@
 import { useSimulationConfig } from "@/store/simulationConfig";
-import * as XLSX from "xlsx";
+import { read, utils, type WorkBook, type WorkSheet } from "xlsx";
 export type CellType = {
   v: string | number;
   f: string;
@@ -16,17 +16,17 @@ export function resizeTable(data: (string | number)[][]): CellType[][] {
         ({
           v: data[r][c] || "",
           f: "",
-          pos: XLSX.utils.encode_cell({ r, c }),
+          pos: utils.encode_cell({ r, c }),
         } as CellType)
     )
   );
 }
 export const readRawExcelFile = (file: ArrayBuffer) => {
   try {
-    const workbook: XLSX.WorkBook = XLSX.read(file, { type: "buffer" });
+    const workbook: WorkBook = read(file, { type: "buffer" });
     const sheetName: string = workbook.SheetNames[0];
-    const sheet: XLSX.WorkSheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet, {
+    const sheet: WorkSheet = workbook.Sheets[sheetName];
+    const data = utils.sheet_to_json(sheet, {
       header: 1,
       blankrows: true,
       raw: true,

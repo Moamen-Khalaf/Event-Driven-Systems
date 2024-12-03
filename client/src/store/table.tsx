@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import * as XSLX from "xlsx";
 import { type CellType } from "@/utils/readRawExcelFile";
 import { useSimulationConfig } from "./simulationConfig";
 import { devtools, persist } from "zustand/middleware";
 import { TableParser } from "@/utils/TableParser";
 import type { WritableDraft } from "immer";
+import { utils } from "xlsx";
 
 interface TableProps {
   selectedCell: CellType;
@@ -23,7 +23,7 @@ const defaultTable = Array.from({ length: 70 }, (_, r) =>
   Array.from({ length: 70 }, (_, c) => ({
     v: "",
     f: "",
-    pos: XSLX.utils.encode_cell({ c, r }),
+    pos: utils.encode_cell({ c, r }),
   }))
 );
 const defaultCell = { v: "", f: "", pos: "" };
@@ -94,7 +94,7 @@ function writeTable(
   if (!srcTable) return;
   srcTable.forEach((row) =>
     row.forEach((cell) => {
-      const { r, c } = XSLX.utils.decode_cell(cell.pos);
+      const { r, c } = utils.decode_cell(cell.pos);
       destTable[r][c] = cell;
     })
   );
