@@ -1,5 +1,4 @@
 import { useTable } from "@/store/table";
-import { utils } from "xlsx";
 function generateColumnHeaders(length: number) {
   const headers = [];
   for (let i = 0; i < length; i++) {
@@ -14,7 +13,7 @@ function generateColumnHeaders(length: number) {
   return headers;
 }
 export function TableHeader() {
-  const seletedCellPos = useTable((state) => state.selectedCell.pos);
+  const seletedCellPos = useTable((state) => state.selectedCellPos);
   const headerLength = useTable((state) => state.table[0].length);
   return (
     <thead>
@@ -32,9 +31,7 @@ export function TableHeader() {
             <th
               key={colIndex}
               className={`border border-gray-400 px-4 py-2 bg-[#2563eb] text-white ${
-                utils.decode_cell(seletedCellPos || "").c === colIndex
-                  ? "bg-[#2d4e94]"
-                  : ""
+                seletedCellPos.c === colIndex ? "bg-[#2d4e94]" : ""
               }`}
             >
               {header}

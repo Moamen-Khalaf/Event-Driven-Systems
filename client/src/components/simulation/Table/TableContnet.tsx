@@ -1,8 +1,7 @@
 import { useTable } from "@/store/table";
-import { utils } from "xlsx";
 export default function TableContnet() {
   const table = useTable((state) => state.table);
-  const seletedCellPos = useTable((state) => state.selectedCell.pos);
+  const seletedCellPos = useTable((state) => state.selectedCellPos);
   const setSelectedCell = useTable((state) => state.setSelectedCell);
   return (
     <tbody>
@@ -10,9 +9,7 @@ export default function TableContnet() {
         <tr key={rowIndex}>
           <td
             className={`sticky left-0 border border-gray-400 px-4 py-2 bg-[#2563eb] text-white ${
-              utils.decode_cell(seletedCellPos || "").r === rowIndex
-                ? "bg-[#2d4e94]"
-                : ""
+              seletedCellPos.r === rowIndex ? "bg-[#2d4e94]" : ""
             }`}
           >
             {rowIndex + 1}
@@ -21,8 +18,7 @@ export default function TableContnet() {
             <td
               key={cellIndex}
               className={`border border-gray-400 px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis ${
-                seletedCellPos ===
-                utils.encode_cell({ c: cellIndex, r: rowIndex })
+                seletedCellPos.r === rowIndex && seletedCellPos.c === cellIndex
                   ? "bg-[#2d4e94]/50 text-white"
                   : ""
               }`}

@@ -9,6 +9,7 @@ import { utils } from "xlsx";
 
 interface TableProps {
   selectedCell: CellType;
+  selectedCellPos: { r: number; c: number };
   table: CellType[][];
   error: string;
   loading: boolean;
@@ -104,12 +105,14 @@ export const useTable = create<TableProps>()(
     persist(
       immer((set, get) => ({
         selectedCell: defaultCell,
+        selectedCellPos: { r: -1, c: -1 },
         table: defaultTable,
         error: "",
         loading: false,
         setSelectedCell: (cell) =>
           set((state) => {
             state.selectedCell = cell;
+            state.selectedCellPos = utils.decode_cell(cell.pos);
           }),
         setTable: (table) =>
           set((state) => {
