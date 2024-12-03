@@ -9,7 +9,10 @@ interface SimulationConfig {
   simulationType: SimulationType | null;
   numberOfClients: number;
   file: File | null;
-  error: string | null;
+  notification: {
+    type: "error" | "success" | null;
+    message: string;
+  };
   loading: boolean;
   setFile: (file: File | null) => void;
   setSimulationType: (type: "normal" | "probability") => void;
@@ -23,7 +26,10 @@ export const useSimulationConfig = create<SimulationConfig>()(
       simulationType: null,
       numberOfClients: 0,
       file: null,
-      error: null,
+      notification: {
+        type: null,
+        message: "",
+      },
       loading: false,
       setFile: (file) =>
         set((state) => {
@@ -41,7 +47,10 @@ export const useSimulationConfig = create<SimulationConfig>()(
         try {
           set((state) => {
             state.loading = true;
-            state.error = null;
+            state.notification = {
+              type: null,
+              message: "",
+            };
           });
           if (get().file === null) throw "no file selected";
           if (get().simulationType === null)
@@ -50,11 +59,21 @@ export const useSimulationConfig = create<SimulationConfig>()(
             throw "no number of clients selected";
           const file = await get().file?.arrayBuffer();
           const table = readRawExcelFile(file!);
+          useTable.getState().clearTable();
           useTable.getState().setTable(table);
+          set((state) => {
+            state.notification = {
+              type: "success",
+              message: "data saved successfully",
+            };
+          });
         } catch (error) {
           console.log(error);
           set((state) => {
-            state.error = error as string;
+            state.notification = {
+              type: "error",
+              message: error as string,
+            };
           });
         }
         set((state) => {

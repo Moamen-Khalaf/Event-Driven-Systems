@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { Settings } from "lucide-react";
-import { ToastAction } from "@radix-ui/react-toast";
+
 import { useToast } from "@/hooks/use-toast";
 
 export default function Setting() {
@@ -35,13 +35,11 @@ export default function Setting() {
         title: "Settings Error",
         variant: "destructive",
         description: notification.message,
-        action: <ToastAction altText="Dismiss">OK</ToastAction>,
       });
     } else if (notification.type) {
       toast({
         title: notification.type,
         description: notification.message,
-        action: <ToastAction altText="Dismiss">OK</ToastAction>,
       });
     }
   }, [notification, toast]);
@@ -108,7 +106,6 @@ export default function Setting() {
                 toast({
                   title: "Chat Cleared",
                   description: "The chat has been successfully cleared.",
-                  action: <ToastAction altText="Dismiss">OK</ToastAction>,
                 });
               }}
             >

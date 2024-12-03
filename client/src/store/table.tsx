@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { type CellType } from "@/utils/readRawExcelFile";
 import { useSimulationConfig } from "./simulationConfig";
-import { devtools, persist } from "zustand/middleware";
+import { devtools } from "zustand/middleware";
 import { TableParser } from "@/utils/TableParser";
 import type { WritableDraft } from "immer";
 import { utils } from "xlsx";
@@ -11,7 +11,10 @@ interface TableProps {
   selectedCell: CellType;
   selectedCellPos: { r: number; c: number };
   table: CellType[][];
-  error: string;
+  notification: {
+    type: "error" | "success" | null;
+    message: string;
+  };
   loading: boolean;
   setSelectedCell: (cell: CellType) => void;
   setTable: (table: CellType[][]) => void;
@@ -102,67 +105,71 @@ function writeTable(
 }
 export const useTable = create<TableProps>()(
   devtools(
-    persist(
-      immer((set, get) => ({
-        selectedCell: defaultCell,
-        selectedCellPos: { r: -1, c: -1 },
-        table: defaultTable,
-        error: "",
-        loading: false,
-        setSelectedCell: (cell) =>
+    immer((set, get) => ({
+      selectedCell: defaultCell,
+      selectedCellPos: { r: -1, c: -1 },
+      table: defaultTable,
+      notification: {
+        type: null,
+        message: "",
+      },
+      loading: false,
+      setSelectedCell: (cell) =>
+        set((state) => {
+          state.selectedCell = cell;
+          state.selectedCellPos = utils.decode_cell(cell.pos);
+        }),
+      setTable: (table) =>
+        set((state) => {
+          writeTable(table, state.table);
+        }),
+      clearTable: () =>
+        set((state) => {
+          state.table = defaultTable;
+          state.selectedCell = defaultCell;
+        }),
+      getCopy: () =>
+        get().table.reduce((acc, row) => {
+          const line = row
+            .reduce((acc, cell) => {
+              return acc + cell.v + "\t";
+            }, "")
+            .trim();
+          return line ? acc + line + "\n" : acc;
+        }, ""),
+      simulate: async () => {
+        set((state) => {
+          state.loading = true;
+          state.notification = {
+            type: null,
+            message: "",
+          };
+        });
+        try {
+          const result = (await simulate()) as {
+            table: CellType[][];
+            arrivals: CellType[][];
+            services: CellType[][];
+          };
           set((state) => {
-            state.selectedCell = cell;
-            state.selectedCellPos = utils.decode_cell(cell.pos);
-          }),
-        setTable: (table) =>
-          set((state) => {
-            writeTable(table, state.table);
-          }),
-        clearTable: () =>
-          set((state) => {
-            state.table = defaultTable;
-            state.selectedCell = defaultCell;
-          }),
-        getCopy: () =>
-          get().table.reduce((acc, row) => {
-            const line = row
-              .reduce((acc, cell) => {
-                return acc + cell.v + "\t";
-              }, "")
-              .trim();
-            return line ? acc + line + "\n" : acc;
-          }, ""),
-        simulate: async () => {
-          set((state) => {
-            state.loading = true;
-            state.error = "";
+            writeTable(result.table, state.table);
+            writeTable(result.arrivals, state.table);
+            writeTable(result.services, state.table);
           });
-          try {
-            const result = (await simulate()) as {
-              table: CellType[][];
-              arrivals: CellType[][];
-              services: CellType[][];
+        } catch (error) {
+          set((state) => {
+            state.notification = {
+              type: "error",
+              message: String(error),
             };
-            set((state) => {
-              writeTable(result.table, state.table);
-              writeTable(result.arrivals, state.table);
-              writeTable(result.services, state.table);
-            });
-          } catch (error) {
-            set((state) => {
-              state.error = String(error);
-            });
-          } finally {
-            set((state) => {
-              state.loading = false;
-            });
-          }
-        },
-      })),
-      {
-        name: "table",
-      }
-    ),
+          });
+        } finally {
+          set((state) => {
+            state.loading = false;
+          });
+        }
+      },
+    })),
     {
       name: "table",
     }
