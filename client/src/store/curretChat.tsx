@@ -17,7 +17,10 @@ interface IMessage {
 
 export interface IChat {
   messages: IMessage[];
-  error: string;
+  notification: {
+    type: "error" | "success" | null;
+    message: string;
+  };
   loading: boolean;
   clearMessages: () => void;
   setErrorMessage: (message: string) => void;
@@ -29,13 +32,21 @@ export const useCurrentChatStore = create<IChat>()(
     persist(
       immer((set) => ({
         messages: [],
-        error: "",
+        notification: {
+          type: null,
+          message: "",
+        },
         loading: false,
         clearMessages: () =>
           set((state) => {
             state.messages = [];
+            state.notification = {
+              type: "success",
+              message: "Messages cleared",
+            };
           }),
-        setErrorMessage: (message) => set((state) => (state.error = message)),
+        setErrorMessage: (message) =>
+          set((state) => (state.notification = { type: "error", message })),
         addMessage: async (message) => {
           try {
             set((state) => {
@@ -53,11 +64,14 @@ export const useCurrentChatStore = create<IChat>()(
             });
           } catch (error) {
             set((state) => {
-              state.error = (error as Error).message || (error as string);
+              state.notification = {
+                message: (error as Error).message || (error as string),
+                type: "error",
+              };
               state.messages.push({
                 role: "assistant",
                 type: "text",
-                content: state.error,
+                content: state.notification.message,
                 timestamp: new Date(),
               });
             });

@@ -7,11 +7,13 @@ interface Settings {
   endpoint: string;
   modelName: string;
   theme: "light" | "dark";
-  error: string | null;
+  notification: {
+    type: "error" | "success" | null;
+    message: string;
+  };
   loading: boolean;
-  setError: (error: string) => void;
   toggleTheme: () => void;
-  setSetting: (token: string, endpoint: string, modelName: string) => void;
+  setSetting: (token?: string, endpoint?: string, modelName?: string) => void;
 }
 const defaultTheme =
   (localStorage.getItem("theme") as "light" | "dark") || "light";
@@ -21,13 +23,12 @@ export const useSetting = create<Settings>()(
       token: "",
       endpoint: "",
       modelName: "",
-      error: null,
+      notification: {
+        type: null,
+        message: "",
+      },
       loading: false,
       theme: defaultTheme,
-      setError: (error) =>
-        set((state) => {
-          state.error = error;
-        }),
       toggleTheme: () =>
         set((state) => {
           state.theme = state.theme === "light" ? "dark" : "light";
@@ -36,9 +37,27 @@ export const useSetting = create<Settings>()(
         }),
       setSetting: (token, endpoint, modelName) =>
         set((state) => {
+          if (!token || !endpoint || !modelName) {
+            state.notification = {
+              type: "error",
+              message: "Please fill all the fields.",
+            };
+            return;
+          }
+          if (!isValidUrl(endpoint)) {
+            state.notification = {
+              type: "error",
+              message: "Please enter a valid URL.",
+            };
+            return;
+          }
           state.token = token;
           state.endpoint = endpoint;
           state.modelName = modelName;
+          state.notification = {
+            type: "success",
+            message: "Settings saved.",
+          };
         }),
     })),
     {
@@ -47,3 +66,12 @@ export const useSetting = create<Settings>()(
     }
   )
 );
+
+const isValidUrl = (urlString: string) => {
+  try {
+    new URL(urlString);
+    return true;
+  } catch {
+    return false;
+  }
+};

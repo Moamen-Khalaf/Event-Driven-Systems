@@ -1,3 +1,4 @@
+import { ToolTip } from "@/components/ToolTip";
 import { useToast } from "@/hooks/use-toast";
 import { useTable } from "@/store/table";
 import { ToastAction } from "@radix-ui/react-toast";
@@ -5,9 +6,9 @@ import { ScanLine } from "lucide-react";
 import { useEffect } from "react";
 
 export default function SimulateButton() {
-  const { toast } = useToast();
-  const simulate = useTable((state) => state.simulate);
   const error = useTable((state) => state.error);
+  const simulate = useTable((state) => state.simulate);
+  const { toast } = useToast();
   useEffect(() => {
     if (error) {
       toast({
@@ -19,16 +20,18 @@ export default function SimulateButton() {
     }
   }, [error, toast]);
   return (
-    <ScanLine
-      className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer hover:animate-pulse"
-      onClick={() => {
-        toast({
-          title: "Simulation Started",
-          description: "The simulation has been successfully started.",
-          action: <ToastAction altText="Dismiss">OK</ToastAction>,
-        });
-        simulate();
-      }}
-    />
+    <ToolTip message="Simulate">
+      <ScanLine
+        className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer hover:animate-pulse"
+        onClick={() => {
+          toast({
+            title: "Simulation Started",
+            description: "The simulation has been successfully started.",
+            action: <ToastAction altText="Dismiss">OK</ToastAction>,
+          });
+          simulate();
+        }}
+      />
+    </ToolTip>
   );
 }

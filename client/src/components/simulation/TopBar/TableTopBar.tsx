@@ -2,6 +2,7 @@ import { useTable } from "@/store/table";
 import { CircleX, Copy, Undo2 } from "lucide-react";
 import SimulateButton from "./SimulateButton";
 import DownloadButton from "./DownloadButton";
+import { ToolTip } from "@/components/ToolTip";
 export function TableTopBar() {
   const selectedCell = useTable((state) => state.selectedCell);
   return (
@@ -18,19 +19,26 @@ export function TableTopBar() {
         className="outline-none bg-transparent focus:outline-none w-full px-4 py-2"
         placeholder="=SUM(A1:A2) etc."
       />
-      <Undo2 className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer hover:animate-pulse" />
+
+      <ToolTip message="Forward Chat">
+        <Undo2 className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer hover:animate-pulse" />
+      </ToolTip>
       <SimulateButton />
       <DownloadButton />
-      <Copy
-        className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer"
-        onClick={() => {
-          navigator.clipboard.writeText(useTable.getState().getCopy());
-        }}
-      />
-      <CircleX
-        className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer"
-        onClick={() => useTable.getState().clearTable()}
-      />
+      <ToolTip message="Copy">
+        <Copy
+          className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer"
+          onClick={() => {
+            navigator.clipboard.writeText(useTable.getState().getCopy());
+          }}
+        />
+      </ToolTip>
+      <ToolTip message="Clear">
+        <CircleX
+          className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer"
+          onClick={() => useTable.getState().clearTable()}
+        />
+      </ToolTip>
     </div>
   );
 }
