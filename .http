@@ -1,5 +1,6 @@
 # @HOST = https://api.edgelabs.me
-@HOST = http://localhost:3000
+# @HOST = http://localhost:3000
+@HOST = http://127.0.0.1:8787
 
 POST {{HOST}}/api/simulate/v1 
 Content-Type: application/json

@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { UserRow } from "./simulateV1";
+import { UserRow } from "./TableV1/simulateV1";
 import { CellType } from "./types";
 dayjs.extend(customParseFormat);
 

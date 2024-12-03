@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "../app-sidebar";
+import { Toaster } from "../ui/toaster";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,6 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <main className="max-w-full relative overflow-hidden">
         <SidebarTrigger className="absolute top-2 z-[50] md:z-[100]" />
         {children}
+        <Toaster />
       </main>
     </SidebarProvider>
   );

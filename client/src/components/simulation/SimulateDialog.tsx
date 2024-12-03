@@ -20,67 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "./ui/input";
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
 import { useRef } from "react";
-import { readRawExcelFile } from "@/utils/readRawExcelFile";
-import { useTable } from "@/store/table";
-type SimulationType = "normal" | "probability";
-interface SimulationConfig {
-  simulationType: SimulationType | null;
-  numberOfClients: number;
-  file: File | null;
-  error: string | null;
-  loading: boolean;
-  setFile: (file: File | null) => void;
-  setSimulationType: (type: "normal" | "probability") => void;
-  setNumberOfClients: (clients: number) => void;
-  save: () => Promise<void>;
-}
-
-const useSimulationConfig = create<SimulationConfig>()(
-  immer((set, get) => ({
-    simulationType: null,
-    numberOfClients: 5,
-    file: null,
-    error: null,
-    loading: false,
-    setFile: (file) =>
-      set((state) => {
-        state.file = file;
-      }),
-    setSimulationType: (type) =>
-      set((state) => {
-        state.simulationType = type;
-      }),
-    setNumberOfClients: (clients) =>
-      set((state) => {
-        state.numberOfClients = clients;
-      }),
-    save: async () => {
-      try {
-        set((state) => {
-          state.loading = true;
-          state.error = null;
-        });
-        if (get().file === null) throw "no file selected";
-        if (get().simulationType === null) throw "no simulation type selected";
-        const file = await get().file?.arrayBuffer();
-        const table = readRawExcelFile(file!);
-        useTable.getState().setTable(table);
-        console.log(table);
-      } catch (error) {
-        set((state) => {
-          state.error = error as string;
-        });
-      }
-      set((state) => {
-        state.loading = false;
-      });
-    },
-  }))
-);
+import { useSimulationConfig } from "@/store/simulationConfig";
+import { Input } from "@/components/ui/input";
 
 function SimulationType() {
   const setSimulationType = useSimulationConfig(
@@ -88,7 +30,9 @@ function SimulationType() {
   );
   return (
     <Select
-      onValueChange={(value) => setSimulationType(value as SimulationType)}
+      onValueChange={(value) =>
+        setSimulationType(value as "normal" | "probability")
+      }
     >
       <SelectTrigger className="grow">
         <SelectValue placeholder="choose simulation version" />
@@ -131,8 +75,13 @@ export function SimulateDialog() {
           <Input
             type="number"
             placeholder="Number of Clients"
-            defaultValue={5}
-            onChange={(e) => setNumberOfClients(+e.target.value)}
+            onChange={(e) => {
+              const value = +e.target.value;
+              if (value < 5 || value > 30) {
+                return false;
+              }
+              setNumberOfClients(value);
+            }}
             max={30}
             min={5}
           />

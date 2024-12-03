@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { CellType } from "./types";
+import { CellType } from "../types";
 dayjs.extend(customParseFormat);
 export type SimulationHeadersV1 =
   | "CLIENT_ID"
@@ -15,7 +15,7 @@ export type SimulationHeadersV1 =
   | "SYSTEM_STATE";
 export type UserRow = Record<SimulationHeadersV1, CellType>;
 
-export default function simulateV1(users: UserRow[]) {
+export default function simulateV1(users: UserRow[], startTime: CellType) {
   let lastUser = users[0];
   lastUser.ARRIVAL_TIME.v = lastUser.INTERARRIVAL_TIME.v;
   lastUser.TIME_SER_BEG.v = lastUser.ARRIVAL_TIME.v;
@@ -25,8 +25,8 @@ export default function simulateV1(users: UserRow[]) {
   lastUser.SYSTEM_STATE.v = lastUser.ARRIVAL_TIME.v;
 
   // formulas
-  lastUser.ARRIVAL_TIME.f = `=${lastUser.INTERARRIVAL_TIME.pos}`;
-  lastUser.TIME_SER_ENDS.f = `=${lastUser.TIME_SER_BEG.pos}+${lastUser.SERVICE_TIME.pos}`;
+  lastUser.ARRIVAL_TIME.f = `=TIME(0,${lastUser.INTERARRIVAL_TIME.pos},0)+${startTime.pos}`;
+  lastUser.TIME_SER_ENDS.f = `=${lastUser.TIME_SER_BEG.pos}+TIME(0,${lastUser.SERVICE_TIME.pos},0)`;
   users[0] = lastUser;
   for (let i = 1; i < users.length; i++) {
     const user = users[i];

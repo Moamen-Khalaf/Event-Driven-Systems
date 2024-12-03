@@ -8,7 +8,7 @@ import {
 import { Paperclip, Upload } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "./ui/input";
-import { SimulateDialog } from "./SimulateDialog";
+import { SimulateDialog } from "./simulation/SimulateDialog";
 
 export function UploadMenu() {
   return (

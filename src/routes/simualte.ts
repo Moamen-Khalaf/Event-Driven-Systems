@@ -1,12 +1,12 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import comulateProp from "../utils/comulateProp";
-import { fillProbabilities } from "../utils/fillProbabilities";
 import { parseUsers } from "../utils/parceUsers";
 import setFormatedTime from "../utils/setFormatedTime";
-import setLookupV1 from "../utils/setLookupV1";
-import simulateV1, { UserRow } from "../utils/simulateV1";
-import { UserRow as UserRowV2 } from "../utils/simulateV2";
+import setLookupV1 from "../utils/TableV1/setLookupV1";
+import simulateV1, { UserRow } from "../utils/TableV1/simulateV1";
+import { fillProbabilities } from "../utils/TableV2/fillProbabilities";
+import { UserRow as UserRowV2 } from "../utils/TableV2/simulateV2";
+import updateProbabilityTable from "../utils/TableV2/updateProbabilityTable";
 import { simualtionV1VSchema } from "../validation/simualteV1Valid";
 import { simualtionV2VSchema } from "../validation/simualteV2Valid";
 
@@ -29,13 +29,14 @@ export const simulateRoute = new Hono()
       ];
       let parsedUsers = parseUsers(table, simulationHeaders) as UserRow[];
       parsedUsers = setLookupV1(parsedUsers, arrivals, services);
-      const simulatedTable = simulateV1(parsedUsers);
+      const simulatedTable = simulateV1(parsedUsers, startTime);
       const formatedTable = setFormatedTime(simulatedTable, startTime);
       return c.json({
         table: formatedTable.map((user) => Object.values(user)),
       });
     } catch (error) {
-      return c.json({ error }, 400);
+      console.log(error);
+      return c.json({ error: String(error) }, 400);
     }
   })
   .post("/v2", zValidator("json", simualtionV2VSchema), (c) => {
@@ -54,15 +55,15 @@ export const simulateRoute = new Hono()
         "SYSTEM_STATE",
       ];
       const parsedUsers = parseUsers(table, simulationHeaders) as UserRowV2[];
-      const comArrivals = comulateProp(arrivals);
-      const comServices = comulateProp(services);
+      const comArrivals = updateProbabilityTable(arrivals);
+      const comServices = updateProbabilityTable(services);
       // version 2 specific code
       const filledUsers = fillProbabilities(
         comServices,
         comArrivals,
         parsedUsers
       );
-      const simulatedTable = simulateV1(filledUsers);
+      const simulatedTable = simulateV1(filledUsers, startTime);
       const formatedTable = setFormatedTime(simulatedTable, startTime);
       return c.json({
         table: formatedTable.map((user) => Object.values(user)),
@@ -71,6 +72,6 @@ export const simulateRoute = new Hono()
       });
     } catch (error) {
       console.log(error);
-      return c.json({ error }, 400);
+      return c.json({ error: String(error) }, 400);
     }
   });

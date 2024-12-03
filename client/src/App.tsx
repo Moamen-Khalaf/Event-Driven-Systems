@@ -7,7 +7,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "./components/ui/resizable";
-import Table from "./components/simulation/Table";
+import Table from "./components/simulation/Table/Table";
 
 function ChatSection() {
   return (
