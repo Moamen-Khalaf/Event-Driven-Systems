@@ -4,6 +4,8 @@ import * as XSLX from "xlsx";
 import { type CellType } from "@/utils/readRawExcelFile";
 import { useSimulationConfig } from "./simulationConfig";
 import { devtools, persist } from "zustand/middleware";
+import { TableParser } from "@/utils/TableParser";
+import type { WritableDraft } from "immer";
 
 interface TableProps {
   selectedCell: CellType;
@@ -16,6 +18,7 @@ interface TableProps {
   getCopy: () => string;
   simulate: () => Promise<void>;
 }
+
 const defaultTable = Array.from({ length: 70 }, (_, r) =>
   Array.from({ length: 70 }, (_, c) => ({
     v: "",
@@ -24,7 +27,7 @@ const defaultTable = Array.from({ length: 70 }, (_, r) =>
   }))
 );
 const defaultCell = { v: "", f: "", pos: "" };
-function parseNormalTable(table: CellType[][]) {
+function parceTable(table: CellType[][]) {
   const result = {
     arrivals: [] as CellType[][],
     services: [] as CellType[][],
@@ -32,71 +35,43 @@ function parseNormalTable(table: CellType[][]) {
     table: [] as CellType[][],
   };
 
-  const skipSpaces = (i: number): number => {
-    while (i < table.length && table[i][0]?.v === "") {
-      i++;
-    }
-    return i;
-  };
-
-  const createTable = (
-    startIndex: number
-  ): { curtable: CellType[][]; nextIndex: number } => {
-    const curtable = [] as CellType[][];
-    let i = startIndex;
-    const tableWidth = table[i].filter((cell) => cell.v !== "").length;
-
-    while (i < table.length && table[i][0]?.v !== "") {
-      curtable.push(table[i].slice(0, tableWidth));
-      i++;
-    }
-    curtable.shift(); // Remove the first row which is the header
-    return { curtable, nextIndex: i };
-  };
-
   let i = 0;
+  const tableParser = new TableParser(table);
+  const parseSection = (
+    index: number
+  ): { section: CellType[][]; nextIndex: number } => {
+    index = tableParser.skipSpaces(index);
+    const { curtable, nextIndex } = tableParser.createTable(index);
+    return { section: curtable, nextIndex };
+  };
 
   // Parse "services" section
-  i = skipSpaces(i);
-  let tableRes = createTable(i);
-  result.services = tableRes.curtable;
-  i = tableRes.nextIndex;
+  let parseResult = parseSection(i);
+  result.services = parseResult.section;
+  i = parseResult.nextIndex;
 
   // Parse "arrivals" section
-  i = skipSpaces(i);
-  tableRes = createTable(i);
-  result.arrivals = tableRes.curtable;
-  i = tableRes.nextIndex;
+  parseResult = parseSection(i);
+  result.arrivals = parseResult.section;
+  i = parseResult.nextIndex;
 
   // Parse "startTime" section
-  i = skipSpaces(i);
+  i = tableParser.skipSpaces(i);
   if (table[i] && table[i][0]?.v === "Start Time:") {
-    result.startTime = table[i][1]; // Assuming the start time is always in the second column
+    result.startTime = table[i][1];
     i++;
   }
 
   // Parse main "table" section
-  i = skipSpaces(i);
-  tableRes = createTable(i);
-  result.table = tableRes.curtable;
+  parseResult = parseSection(i);
+  result.table = parseResult.section;
 
-  console.log(result);
   return result;
 }
 
-function parceProbTable(table: CellType[][]) {}
-
-function parceTable(table: CellType[][], tableType: "normal" | "probability") {
-  switch (tableType) {
-    case "normal":
-      return parseNormalTable(table);
-    case "probability":
-      return parceProbTable(table);
-  }
-}
 async function simulate() {
+  const parcedTable = parceTable(useTable.getState().table);
   const tableType = useSimulationConfig.getState().simulationType;
-  const parcedTable = parceTable(useTable.getState().table, tableType!);
   const version = tableType === "normal" ? "v1" : "v2";
   const data = await fetch(`/api/simulate/${version}`, {
     method: "POST",
@@ -112,6 +87,18 @@ async function simulate() {
   const result = await data.json();
   return result;
 }
+function writeTable(
+  srcTable: CellType[][],
+  destTable: WritableDraft<CellType>[][]
+) {
+  if (!srcTable) return;
+  srcTable.forEach((row) =>
+    row.forEach((cell) => {
+      const { r, c } = XSLX.utils.decode_cell(cell.pos);
+      destTable[r][c] = cell;
+    })
+  );
+}
 export const useTable = create<TableProps>()(
   devtools(
     persist(
@@ -126,12 +113,7 @@ export const useTable = create<TableProps>()(
           }),
         setTable: (table) =>
           set((state) => {
-            table.forEach((row) =>
-              row.forEach((cell) => {
-                const { r, c } = XSLX.utils.decode_cell(cell.pos);
-                state.table[r][c] = cell;
-              })
-            );
+            writeTable(table, state.table);
           }),
         clearTable: () =>
           set((state) => {
@@ -153,15 +135,15 @@ export const useTable = create<TableProps>()(
             state.error = "";
           });
           try {
-            const result = (await simulate()) as { table: CellType[][] };
-            console.log(result);
+            const result = (await simulate()) as {
+              table: CellType[][];
+              arrivals: CellType[][];
+              services: CellType[][];
+            };
             set((state) => {
-              result.table.forEach((row) => {
-                row.forEach((cell) => {
-                  const { r, c } = XSLX.utils.decode_cell(cell.pos);
-                  state.table[r][c] = cell;
-                });
-              });
+              writeTable(result.table, state.table);
+              writeTable(result.arrivals, state.table);
+              writeTable(result.services, state.table);
             });
           } catch (error) {
             set((state) => {
