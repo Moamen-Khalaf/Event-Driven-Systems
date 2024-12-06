@@ -1,17 +1,6 @@
 import { useTable } from "@/store/table";
-function generateColumnHeaders(length: number) {
-  const headers = [];
-  for (let i = 0; i < length; i++) {
-    let header = "";
-    let temp = i;
-    while (temp >= 0) {
-      header = String.fromCharCode((temp % 26) + 65) + header;
-      temp = Math.floor(temp / 26) - 1;
-    }
-    headers.push(header);
-  }
-  return headers;
-}
+import generateColumnHeaders from "@/utils/generateColumnHeaders";
+
 export function TableHeader() {
   const seletedCellPos = useTable((state) => state.selectedCellPos);
   const headerLength = useTable((state) => state.table[0].length);

@@ -1,7 +1,7 @@
 import { useSetting } from "@/store/setting";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useEffect, useRef } from "react";
+import { memo, useState } from "react";
 import { useCurrentChatStore } from "@/store/curretChat";
 
 import {
@@ -14,35 +14,26 @@ import {
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { Settings } from "lucide-react";
+import useToastNotification from "@/hooks/useToastNotification";
 
-import { useToast } from "@/hooks/use-toast";
-
-export default function Setting() {
+function Setting() {
   const notification = useSetting((state) => state.notification);
   const loading = useSetting((state) => state.loading);
   const token = useSetting((state) => state.token);
   const endpoint = useSetting((state) => state.endpoint);
   const modelName = useSetting((state) => state.modelName);
+
   const setSetting = useSetting((state) => state.setSetting);
-  const clearMessages = useCurrentChatStore((state) => state.clearMessages);
-  const tokenElement = useRef<HTMLInputElement>(null);
-  const endpointElement = useRef<HTMLInputElement>(null);
-  const modelNameElement = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-  useEffect(() => {
-    if (notification.type === "error") {
-      toast({
-        title: "Settings Error",
-        variant: "destructive",
-        description: notification.message,
-      });
-    } else if (notification.type) {
-      toast({
-        title: notification.type,
-        description: notification.message,
-      });
-    }
-  }, [notification, toast]);
+
+  const [localToken, setLocalToken] = useState(token);
+  const [localEndpoint, setLocalEndpoint] = useState(endpoint);
+  const [localModelName, setLocalModelName] = useState(modelName);
+
+  useToastNotification(notification, () => {
+    useSetting.setState((state) => {
+      state.notification = { type: null, message: "" };
+    });
+  });
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -56,27 +47,27 @@ export default function Setting() {
           <label>
             <span>Token</span>
             <Input
-              ref={tokenElement}
+              value={localToken}
+              onChange={(e) => setLocalToken(e.target.value)}
               type="password"
-              defaultValue={token}
               placeholder="Enter your Token"
             />
           </label>
           <label>
             <span>Endpoint</span>
             <Input
-              ref={endpointElement}
+              value={localEndpoint}
+              onChange={(e) => setLocalEndpoint(e.target.value)}
               type="text"
-              defaultValue={endpoint}
               placeholder="Enter the Endpoint"
             />
           </label>
           <label>
             <span>Model Name</span>
             <Input
-              ref={modelNameElement}
+              value={localModelName}
+              onChange={(e) => setLocalModelName(e.target.value)}
               type="text"
-              defaultValue={modelName}
               placeholder="Enter the Model Name"
             />
           </label>
@@ -87,33 +78,42 @@ export default function Setting() {
           </DialogClose>
           <Button
             disabled={loading}
-            onClick={() => {
+            onClick={() =>
               setSetting(
-                tokenElement.current!.value.trim(),
-                endpointElement.current!.value.trim(),
-                modelNameElement.current!.value.trim()
-              );
-            }}
+                localToken.trim(),
+                localEndpoint.trim(),
+                localModelName.trim()
+              )
+            }
           >
             {loading ? "Loading..." : "Save"}
           </Button>
           <DialogClose asChild>
-            <Button
-              className=""
-              variant={"destructive"}
-              onClick={() => {
-                clearMessages();
-                toast({
-                  title: "Chat Cleared",
-                  description: "The chat has been successfully cleared.",
-                });
-              }}
-            >
-              Clear Chat
-            </Button>
+            <ClearChatButton />
           </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+export default memo(Setting);
+
+function ClearChatButton() {
+  const clearMessages = useCurrentChatStore((state) => state.clearMessages);
+  const notification = useCurrentChatStore((state) => state.notification);
+  useToastNotification(notification, () => {
+    useCurrentChatStore.setState((state) => {
+      state.notification = { type: null, message: "" };
+    });
+  });
+  return (
+    <Button
+      variant={"destructive"}
+      onClick={() => {
+        clearMessages();
+      }}
+    >
+      Clear Chat
+    </Button>
   );
 }

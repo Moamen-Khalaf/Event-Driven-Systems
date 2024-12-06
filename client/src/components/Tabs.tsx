@@ -74,7 +74,7 @@ export default function Tabs() {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                <ScrollArea className="overflow-auto">
+                <ScrollArea className="overflow-y-auto overflow-x-hidden">
                   {tabs.map((tab) => (
                     <ChatTab item={tab} key={tab.id} />
                   ))}

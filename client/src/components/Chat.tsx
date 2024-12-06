@@ -1,8 +1,8 @@
 import { useCurrentChatStore } from "@/store/curretChat";
+import MarkdownRenderer from "@/utils/MarkdownRenderer";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Copy, Pencil } from "lucide-react";
 import { memo, useEffect, useRef, useState, type RefObject } from "react";
-import ReactMarkdown from "react-markdown";
 
 function UserMessage({ message }: { message: string }) {
   const [edit, setEdit] = useState(false);
@@ -24,36 +24,11 @@ function UserMessage({ message }: { message: string }) {
     </div>
   );
 }
-function AssistantMessage({
-  message,
-  animate,
-}: {
-  message: string;
-  animate: boolean;
-}) {
-  const [visibleText, setVisibleText] = useState("");
-
-  useEffect(() => {
-    if (!animate) {
-      setVisibleText(message);
-      return;
-    }
-    let index = 0; // Start from the first character
-    const interval = setInterval(() => {
-      if (index < message.length) {
-        setVisibleText((prev) => prev + message[index]);
-        index++;
-      } else {
-        clearInterval(interval); // Stop the animation when done
-      }
-    }, 40); // Adjust the speed of typing (in ms)
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, [animate, message]);
+function AssistantMessage({ message }: { message: string }) {
   return (
     <div className="flex w-full flex-col">
       <div className="p-2 rounded-lg prose text-foreground  md:max-w-[90%]">
-        <ReactMarkdown>{visibleText}</ReactMarkdown>
+        <MarkdownRenderer content={message} />
       </div>
       <Copy
         className="w-4  ml-3 hover:text-foreground/60 cursor-pointer"
@@ -94,13 +69,7 @@ function Chat({ className }: { className?: string }) {
         message.role === "system" ? null : message.role === "user" ? (
           <UserMessage message={message.content} key={key} />
         ) : (
-          <AssistantMessage
-            message={message.content}
-            animate={
-              new Date(message.timestamp).getTime() === new Date().getTime()
-            }
-            key={key}
-          />
+          <AssistantMessage message={message.content} key={key} />
         )
       )}
     </ScrollArea>

@@ -94,6 +94,14 @@ export default {
               borderBottomColor: theme("colors.gray.200"),
               padding: theme("spacing.2"),
             },
+            // Math-specific styling
+            ".katex": {
+              color: theme("colors.gray.800"),
+              fontSize: theme("fontSize.sm"),
+            },
+            ".katex-display": {
+              margin: theme("spacing.4"),
+            },
           },
         },
       }),

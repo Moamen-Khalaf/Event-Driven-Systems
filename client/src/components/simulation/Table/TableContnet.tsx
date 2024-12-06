@@ -1,8 +1,17 @@
 import { useTable } from "@/store/table";
+import extractPositions from "@/utils/extractPositions";
+import { useMemo } from "react";
+
 export default function TableContnet() {
   const table = useTable((state) => state.table);
   const seletedCellPos = useTable((state) => state.selectedCellPos);
+  const selectedCell = useTable((state) => state.selectedCell);
   const setSelectedCell = useTable((state) => state.setSelectedCell);
+  const positions = useMemo(
+    () => extractPositions(selectedCell.f.replaceAll("$", "")),
+    [selectedCell.f]
+  );
+
   return (
     <tbody>
       {table.map((_, rowIndex: number) => (
@@ -20,6 +29,10 @@ export default function TableContnet() {
               className={`border border-gray-400 px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis ${
                 seletedCellPos.r === rowIndex && seletedCellPos.c === cellIndex
                   ? "bg-[#2d4e94]/50 text-white"
+                  : ""
+              } ${
+                positions.includes(cell.pos)
+                  ? "bg-foreground/10 border-foreground border-dashed border-2"
                   : ""
               }`}
               onClick={() => {

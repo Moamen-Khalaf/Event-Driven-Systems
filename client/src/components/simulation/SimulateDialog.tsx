@@ -20,31 +20,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useSimulationConfig } from "@/store/simulationConfig";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import useToastNotification from "@/hooks/useToastNotification";
 
 function SimulationType() {
   const setSimulationType = useSimulationConfig(
     (state) => state.setSimulationType
   );
-  const { toast } = useToast();
   const notification = useSimulationConfig((state) => state.notification);
-  useEffect(() => {
-    if (notification.type === "error") {
-      toast({
-        title: "Simulation Error",
-        variant: "destructive",
-        description: notification.message,
-      });
-    } else if (notification.type === "success") {
-      toast({
-        title: "Data Saved Successfully",
-        description: notification.message,
-      });
-    }
-  }, [notification, toast]);
+  useToastNotification(notification, () => {
+    useSimulationConfig.getState().notification = { type: null, message: "" };
+  });
   return (
     <Select
       onValueChange={(value) =>
