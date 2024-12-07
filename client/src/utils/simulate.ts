@@ -4,6 +4,9 @@ import { useTable } from "@/store/table";
 
 export async function simulate() {
   const parcedTable = parceTable(useTable.getState().table);
+  parcedTable.arrivals.shift();
+  parcedTable.services.shift();
+  parcedTable.table.shift();
   const tableType = useSimulationConfig.getState().simulationType;
   const version = tableType === "normal" ? "v1" : "v2";
   const data = await fetch(`/api/simulate/${version}`, {

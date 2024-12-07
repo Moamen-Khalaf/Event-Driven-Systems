@@ -11,8 +11,11 @@ export type INotification = {
 };
 interface TableProps {
   selectedCell: CellType;
-  selectedCellPos: { r: number; c: number };
   table: CellType[][];
+  chartData: {
+    Clock: string;
+    Customers: number;
+  }[];
   notification: INotification;
   loading: boolean;
   setSelectedCell: (cell: CellType) => void;
@@ -35,7 +38,7 @@ export const useTable = create<TableProps>()(
   devtools(
     immer((set, get) => ({
       selectedCell: defaultCell,
-      selectedCellPos: { r: -1, c: -1 },
+      chartData: [],
       table: defaultTable,
       notification: {
         type: null,
@@ -45,7 +48,6 @@ export const useTable = create<TableProps>()(
       setSelectedCell: (cell) =>
         set((state) => {
           state.selectedCell = cell;
-          state.selectedCellPos = utils.decode_cell(cell.pos);
         }),
       setTable: (table) =>
         set((state) => {
@@ -78,11 +80,16 @@ export const useTable = create<TableProps>()(
             table: CellType[][];
             arrivals: CellType[][];
             services: CellType[][];
+            chartData: {
+              Clock: string;
+              Customers: number;
+            }[];
           };
           set((state) => {
             writeTable(result.table, state.table);
             writeTable(result.arrivals, state.table);
             writeTable(result.services, state.table);
+            state.chartData = result.chartData;
           });
         } catch (error) {
           set((state) => {

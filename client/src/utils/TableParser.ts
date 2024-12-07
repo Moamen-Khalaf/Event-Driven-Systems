@@ -26,7 +26,7 @@ export class TableParser {
       curtable.push(this.table[i].slice(0, tableWidth));
       i++;
     }
-    curtable.shift(); // Remove the first row which is the header
+    // curtable.shift(); // Remove the first row which is the header
     return { curtable, nextIndex: i };
   }
 }

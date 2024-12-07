@@ -1,8 +1,11 @@
 import { useTable } from "@/store/table";
 import generateColumnHeaders from "@/utils/generateColumnHeaders";
+import { useMemo } from "react";
+import { utils } from "xlsx";
 
 export function TableHeader() {
-  const seletedCellPos = useTable((state) => state.selectedCellPos);
+  const cellPos = useTable((state) => state.selectedCell.pos);
+  const seletedCellPos = utils.decode_cell(cellPos);
   const headerLength = useTable((state) => state.table[0].length);
   return (
     <thead>
@@ -15,17 +18,21 @@ export function TableHeader() {
         >
           #
         </th>
-        {generateColumnHeaders(headerLength).map(
-          (header: string, colIndex: number) => (
-            <th
-              key={colIndex}
-              className={`border border-gray-400 px-4 py-2 bg-[#2563eb] text-white ${
-                seletedCellPos.c === colIndex ? "bg-[#2d4e94]" : ""
-              }`}
-            >
-              {header}
-            </th>
-          )
+        {useMemo(
+          () =>
+            generateColumnHeaders(headerLength).map(
+              (header: string, colIndex: number) => (
+                <th
+                  key={colIndex}
+                  className={`border border-gray-400 px-4 py-2 bg-[#2563eb] text-white ${
+                    seletedCellPos.c === colIndex ? "bg-[#2d4e94]" : ""
+                  }`}
+                >
+                  {header}
+                </th>
+              )
+            ),
+          [headerLength, seletedCellPos.c]
         )}
       </tr>
     </thead>

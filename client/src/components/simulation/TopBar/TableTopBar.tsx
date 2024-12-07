@@ -5,6 +5,8 @@ import DownloadButton from "./DownloadButton";
 import { ToolTip } from "@/components/ToolTip";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { useCurrentChatStore } from "@/store/curretChat";
+import { DrawerDemo } from "../ChartDrawer";
+import { parceTable } from "@/utils/parceTable";
 export function TableTopBar() {
   const selectedCell = useTable((state) => state.selectedCell);
   return (
@@ -28,12 +30,15 @@ export function TableTopBar() {
             onClick={() => {
               useCurrentChatStore
                 .getState()
-                .setReply(useTable.getState().getCopy());
+                .setReply(
+                  JSON.stringify(parceTable(useTable.getState().table))
+                );
             }}
             className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer hover:animate-pulse"
           />
         </ToolTip>
         <SimulateButton />
+        <DrawerDemo />
         <DownloadButton />
         <ToolTip message="Copy">
           <Copy

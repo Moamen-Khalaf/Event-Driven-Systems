@@ -7,6 +7,7 @@ import {
   ResizablePanelGroup,
 } from "./components/ui/resizable";
 import Table from "./components/simulation/Table/Table";
+import { useMediaQuery } from "usehooks-ts";
 
 function ChatSection() {
   return (
@@ -32,10 +33,14 @@ function TableSection() {
 }
 
 function App() {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
   return (
     <div className="bg-secondary h-[100vh] overflow-hidden">
       <Layout>
-        <ResizablePanelGroup direction={"horizontal"} className="w-[50vh]">
+        <ResizablePanelGroup
+          direction={isDesktop ? "horizontal" : "vertical"}
+          className="w-[50vh]"
+        >
           <ChatSection />
           <ResizableHandle withHandle className="bg-sidebar-foreground" />
           <TableSection />

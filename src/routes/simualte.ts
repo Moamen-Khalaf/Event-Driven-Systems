@@ -1,5 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import getChartData from "../utils/getChartData";
 import { parseUsers } from "../utils/parceUsers";
 import setFormatedTime from "../utils/setFormatedTime";
 import setLookupV1 from "../utils/TableV1/setLookupV1";
@@ -30,9 +31,11 @@ export const simulateRoute = new Hono()
       let parsedUsers = parseUsers(table, simulationHeaders) as UserRow[];
       parsedUsers = setLookupV1(parsedUsers, arrivals, services);
       const simulatedTable = simulateV1(parsedUsers, startTime);
+      const chartData = getChartData(simulatedTable);
       const formatedTable = setFormatedTime(simulatedTable, startTime);
       return c.json({
         table: formatedTable.map((user) => Object.values(user)),
+        chartData,
       });
     } catch (error) {
       console.log(error);
@@ -64,11 +67,13 @@ export const simulateRoute = new Hono()
         parsedUsers
       );
       const simulatedTable = simulateV1(filledUsers, startTime);
+      const chartData = getChartData(simulatedTable);
       const formatedTable = setFormatedTime(simulatedTable, startTime);
       return c.json({
         table: formatedTable.map((user) => Object.values(user)),
         arrivals: comArrivals,
         services: comServices,
+        chartData,
       });
     } catch (error) {
       console.log(error);

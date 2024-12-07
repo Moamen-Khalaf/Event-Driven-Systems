@@ -1,11 +1,12 @@
 import { useTable } from "@/store/table";
 import extractPositions from "@/utils/extractPositions";
 import { useMemo } from "react";
+import { utils } from "xlsx";
 
 export default function TableContnet() {
   const table = useTable((state) => state.table);
-  const seletedCellPos = useTable((state) => state.selectedCellPos);
   const selectedCell = useTable((state) => state.selectedCell);
+  const seletedCellPos = utils.decode_cell(selectedCell.pos);
   const setSelectedCell = useTable((state) => state.setSelectedCell);
   const positions = useMemo(
     () => extractPositions(selectedCell.f.replaceAll("$", "")),
