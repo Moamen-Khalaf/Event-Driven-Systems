@@ -1,6 +1,7 @@
 import { useTable } from "@/store/table";
-import extractPositions from "@/utils/extractPositions";
-import { useMemo } from "react";
+import extractPositionsWithColors, {
+  findCellDetails,
+} from "@/utils/extractPositions";
 import { utils } from "xlsx";
 
 export default function TableContnet() {
@@ -8,9 +9,8 @@ export default function TableContnet() {
   const selectedCell = useTable((state) => state.selectedCell);
   const seletedCellPos = utils.decode_cell(selectedCell.pos);
   const setSelectedCell = useTable((state) => state.setSelectedCell);
-  const positions = useMemo(
-    () => extractPositions(selectedCell.f.replaceAll("$", "")),
-    [selectedCell.f]
+  const rangesWithColors = extractPositionsWithColors(
+    selectedCell.f.replaceAll("$", "")
   );
 
   return (
@@ -24,25 +24,35 @@ export default function TableContnet() {
           >
             {rowIndex + 1}
           </td>
-          {table[rowIndex].map((cell, cellIndex) => (
-            <td
-              key={cellIndex}
-              className={`border border-gray-400 px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis ${
-                seletedCellPos.r === rowIndex && seletedCellPos.c === cellIndex
-                  ? "bg-[#2d4e94]/50 text-white"
-                  : ""
-              } ${
-                positions.includes(cell.pos)
-                  ? "bg-foreground/10 border-foreground border-dashed border-2"
-                  : ""
-              }`}
-              onClick={() => {
-                setSelectedCell(cell);
-              }}
-            >
-              {cell.v}
-            </td>
-          ))}
+          {table[rowIndex].map((cell, cellIndex) => {
+            const foundedCell = findCellDetails(cell.pos, rangesWithColors);
+            return (
+              <td
+                key={cellIndex}
+                style={
+                  foundedCell
+                    ? {
+                        backgroundColor: `${foundedCell.color}20`,
+                        borderColor: foundedCell.color,
+                        borderWidth: "2px",
+                        borderStyle: "dashed",
+                      }
+                    : {}
+                }
+                className={`border border-gray-400 px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis ${
+                  seletedCellPos.r === rowIndex &&
+                  seletedCellPos.c === cellIndex
+                    ? "bg-foreground/10 "
+                    : ""
+                }`}
+                onClick={() => {
+                  setSelectedCell(cell);
+                }}
+              >
+                {cell.v}
+              </td>
+            );
+          })}
         </tr>
       ))}
     </tbody>
