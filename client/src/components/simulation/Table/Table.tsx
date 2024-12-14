@@ -4,7 +4,7 @@ import { TableTopBar } from "../TopBar/TableTopBar";
 
 export default function Table() {
   return (
-    <>
+    <div id="table">
       <TableTopBar />
       <div className="flex-grow w-full transition-opacity duration-300 opacity-100 max-h-[95vh] overflow-auto">
         <table className="table-auto w-full border-collapse text-center select-none">
@@ -12,6 +12,6 @@ export default function Table() {
           <TableContnet />
         </table>
       </div>
-    </>
+    </div>
   );
 }

@@ -4,14 +4,14 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { ToolTip } from "../ToolTip";
 import { Chart } from "./Chart";
 
-export function DrawerDemo() {
+export function ChartDrawer() {
   return (
     <Drawer>
-      <DrawerTrigger asChild>
-        <ToolTip message="Chart">
+      <ToolTip message="Chart">
+        <DrawerTrigger asChild>
           <ChartLine className="w-14 hover:text-blue-500 hover:dark:text-white cursor-pointer" />
-        </ToolTip>
-      </DrawerTrigger>
+        </DrawerTrigger>
+      </ToolTip>
       <DrawerContent>
         <div className="w-full md:w-[50%] md:h-1/2 mx-auto my-2">
           <Chart />

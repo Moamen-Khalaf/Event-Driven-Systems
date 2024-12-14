@@ -5,6 +5,7 @@ import { devtools } from "zustand/middleware";
 import { utils } from "xlsx";
 import writeTable from "@/utils/writeTable";
 import { simulate } from "@/utils/simulate";
+import { TableParser } from "@/utils/TableParser";
 export type INotification = {
   type: "error" | "success" | null;
   message: string;
@@ -23,6 +24,7 @@ interface TableProps {
   clearTable: () => void;
   getCopy: () => string;
   simulate: () => Promise<void>;
+  getParcedTable: () => CellType[][][];
 }
 
 const defaultTable = Array.from({ length: 70 }, (_, r) =>
@@ -103,6 +105,11 @@ export const useTable = create<TableProps>()(
             state.loading = false;
           });
         }
+      },
+      getParcedTable: () => {
+        const table = get().table;
+        const parsedTables = new TableParser(table).getParsedTables();
+        return parsedTables;
       },
     })),
     {

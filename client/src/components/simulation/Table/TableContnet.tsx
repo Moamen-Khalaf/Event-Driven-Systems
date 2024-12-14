@@ -14,7 +14,7 @@ export default function TableContnet() {
   );
 
   return (
-    <tbody>
+    <tbody className={"text-primary bg-primary-foreground"}>
       {table.map((_, rowIndex: number) => (
         <tr key={rowIndex}>
           <td

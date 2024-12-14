@@ -24,6 +24,7 @@ const chartConfig = {
 
 export function Chart() {
   const chartData = useTable((state) => state.chartData);
+
   return (
     <Card>
       <CardHeader>

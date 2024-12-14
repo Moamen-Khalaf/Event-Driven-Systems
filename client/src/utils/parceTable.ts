@@ -9,36 +9,20 @@ export function parceTable(table: CellType[][]) {
     table: [] as CellType[][],
   };
 
-  let i = 0;
   const tableParser = new TableParser(table);
-  const parseSection = (
-    index: number
-  ): { section: CellType[][]; nextIndex: number } => {
-    index = tableParser.skipSpaces(index);
-    const { curtable, nextIndex } = tableParser.createTable(index);
-    return { section: curtable, nextIndex };
-  };
-
+  const parsedTable = tableParser.getParsedTables();
   // Parse "services" section
-  let parseResult = parseSection(i);
-  result.services = parseResult.section;
-  i = parseResult.nextIndex;
+  result.services = parsedTable[0] as CellType[][];
 
   // Parse "arrivals" section
-  parseResult = parseSection(i);
-  result.arrivals = parseResult.section;
-  i = parseResult.nextIndex;
+  result.arrivals = parsedTable[1];
 
   // Parse "startTime" section
-  i = tableParser.skipSpaces(i);
-  if (table[i] && table[i][0]?.v === "Start Time:") {
-    result.startTime = table[i][1];
-    i++;
-  }
+  result.startTime = parsedTable[2][0][1];
 
   // Parse main "table" section
-  parseResult = parseSection(i);
-  result.table = parseResult.section;
+  result.table = parsedTable[3];
+  console.log(result);
 
   return result;
 }
