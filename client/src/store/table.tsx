@@ -26,6 +26,7 @@ interface TableProps {
   simulate: () => Promise<void>;
   getParcedTable: () => CellType[][][];
   setCell: (cell: CellType) => void;
+  setCells: (cells: CellType[]) => void;
 }
 
 const defaultTable = Array.from({ length: 70 }, (_, r) =>
@@ -127,6 +128,11 @@ export const useTable = create<TableProps>()(
 
             state.table = updatedTable;
             state.selectedCell = cell;
+          });
+        },
+        setCells: (cells) => {
+          cells.forEach((cell) => {
+            get().setCell(cell);
           });
         },
       })),

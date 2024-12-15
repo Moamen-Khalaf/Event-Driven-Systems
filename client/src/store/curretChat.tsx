@@ -2,11 +2,12 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
 import { sendToGPT } from "@/utils/sendToGPT";
+import { useTable } from "./table";
 
 interface IMessage {
   timestamp: Date;
   role: "user" | "system" | "assistant";
-  type: "text" | "table";
+  type: "text" | "update";
   content: string;
 }
 
@@ -63,6 +64,9 @@ export const useCurrentChatStore = create<IChat>()(
         set((state) => (state.notification = { type: "error", message })),
       addMessage: async (message) => {
         try {
+          const messageType = message.content.includes("@update")
+            ? "update"
+            : "text";
           set((state) => {
             state.loading = true;
             if (state.reply) {
@@ -73,17 +77,25 @@ export const useCurrentChatStore = create<IChat>()(
                 timestamp: new Date(),
               });
             }
-            state.messages.push({ ...message, timestamp: new Date() });
-          });
-          const response = await sendToGPT();
-          set((state) => {
             state.messages.push({
-              role: "assistant",
-              type: "text",
-              content: response.choices[0].message.content as string,
+              ...message,
+              type: messageType,
               timestamp: new Date(),
             });
           });
+          const response = await sendToGPT();
+          const responseMessage = response.choices[0].message.content as string;
+          set((state) => {
+            state.messages.push({
+              role: messageType === "update" ? "system" : "assistant",
+              type: "update",
+              content: responseMessage,
+              timestamp: new Date(),
+            });
+          });
+          if (messageType === "update") {
+            useTable.getState().setCells(JSON.parse(responseMessage));
+          }
         } catch (error) {
           set((state) => {
             state.notification = {

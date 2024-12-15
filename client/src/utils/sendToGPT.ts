@@ -29,7 +29,11 @@ export async function sendToGPT() {
       {
         role: "system",
         content:
-          "you are a table bot that assists users with table data. you are in sumulation system that simulates event driven systems",
+          "you are a table bot that assists users with table data. you are in a simulation system that simulates event-driven systems",
+      },
+      {
+        role: "system",
+        content: `if you read @update this gives you access to the table editing. You can send cells represented by this { v:"the value", f:"the formula", pos:"position" }. Send it as an array of cells having your changes in plain text without any markdown`,
       },
       { role: "system", content: JSON.stringify(parsedTables) },
       ...messages,
