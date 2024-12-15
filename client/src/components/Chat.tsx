@@ -3,6 +3,7 @@ import MarkdownRenderer from "@/utils/MarkdownRenderer";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Copy, Reply } from "lucide-react";
 import { memo, useEffect, useState } from "react";
+import { Skeleton } from "./ui/skeleton";
 
 function UserMessage({ message }: { message: string }) {
   const [reply, setReply] = useState(false);
@@ -48,9 +49,20 @@ function scrollToBottom(element: HTMLElement) {
     });
   }, 0);
 }
+function ResponceSkeleton() {
+  return (
+    <div className="space-y-2">
+      <Skeleton className="h-4 w-4 rounded-full animate-bounce" />
+      <Skeleton className="h-4 w-[200px]" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-8 w-full" />
+    </div>
+  );
+}
 
-function Chat({ className }: { className?: string }) {
+function Chat() {
   const messages = useCurrentChatStore((state) => state.messages);
+  const loading = useCurrentChatStore((state) => state.loading);
   useEffect(() => {
     const unsubscribe = useCurrentChatStore.subscribe(
       (state) => state.messages.length,
@@ -65,7 +77,10 @@ function Chat({ className }: { className?: string }) {
   }, []);
 
   return (
-    <ScrollArea className={className} id="chat">
+    <ScrollArea
+      className="grow ml-2 md:ml-12 h-[50vh] flex gap-4 flex-col px-4 overflow-auto pt-10"
+      id="chat"
+    >
       {messages.map((message, key) =>
         message.role === "system" ? null : message.role === "user" ? (
           <UserMessage message={message.content} key={key} />
@@ -73,6 +88,7 @@ function Chat({ className }: { className?: string }) {
           <AssistantMessage message={message.content} key={key} />
         )
       )}
+      {loading && <ResponceSkeleton />}
     </ScrollArea>
   );
 }

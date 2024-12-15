@@ -16,7 +16,7 @@ function ChatSection() {
       minSize={35}
       className="flex flex-col gap-2"
     >
-      <Chat className="grow ml-2 md:ml-12 h-[50vh] flex gap-4 flex-col px-4 overflow-auto pt-10" />
+      <Chat />
       <div className="mx-2 md:mx-12 flex flex-col place-content-center">
         <ChatInput />
       </div>

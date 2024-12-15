@@ -9,15 +9,16 @@ export default function TableInputBar() {
       (state) => state.selectedCell,
       (current) => {
         setCell(current);
+        document.getElementById("Tableinput")?.focus();
       }
     );
     return () => unsubscribe();
   }, []);
   const handleChange = (newValue: string) => {
     if (newValue.startsWith("=")) {
-      setCell({ ...cell, f: newValue, v: "" });
+      setCell({ ...cell, f: newValue });
     } else {
-      setCell({ ...cell, v: newValue, f: "" });
+      setCell({ ...cell, v: newValue });
     }
   };
   return (
@@ -29,6 +30,7 @@ export default function TableInputBar() {
         className="bg-transparent focus:outline-none w-14 text-center px-auto py-2 border-r border-gray-400 font-bold"
       />
       <input
+        id="Tableinput"
         type="text"
         value={cell.f || cell.v || ""}
         onChange={(e) => handleChange(e.target.value)}
