@@ -4,7 +4,7 @@ import { TableTopBar } from "../TopBar/TableTopBar";
 
 export default function Table() {
   return (
-    <div id="table">
+    <div id="table" className="transition-all duration-500 ease-in-out">
       <TableTopBar />
       <div className="flex-grow w-full transition-opacity duration-300 opacity-100 max-h-[95vh] overflow-auto">
         <table className="table-auto w-full border-collapse text-center select-none">

@@ -73,7 +73,6 @@ export const useCurrentChatStore = create<IChat>()(
                 timestamp: new Date(),
               });
             }
-            state.reply = "";
             state.messages.push({ ...message, timestamp: new Date() });
           });
           const response = await sendToGPT();
