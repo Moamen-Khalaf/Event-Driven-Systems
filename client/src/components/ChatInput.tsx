@@ -10,7 +10,7 @@ function Replay() {
     reply && (
       <div className="px-8 flex bg-secondary/60 pt-4 gap-3 text-neutral-300 justify-between">
         <Forward />
-        <span className="max-w-[90%] overflow-clip text-ellipsis text-nowrap">
+        <span className="w-[90%] overflow-clip text-ellipsis text-nowrap">
           {reply}
         </span>
         <X

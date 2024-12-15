@@ -1,24 +1,25 @@
 import { useCurrentChatStore } from "@/store/curretChat";
 import MarkdownRenderer from "@/utils/MarkdownRenderer";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Copy, Pencil } from "lucide-react";
-import { memo, useEffect, useRef, useState, type RefObject } from "react";
+import { Copy, Reply } from "lucide-react";
+import { memo, useEffect, useState } from "react";
 
 function UserMessage({ message }: { message: string }) {
-  const [edit, setEdit] = useState(false);
+  const [reply, setReply] = useState(false);
+  const forwardMessage = useCurrentChatStore((state) => state.setReply);
   return (
     <div
       className="flex gap-2 w-full flex-row-reverse items-center"
-      onMouseOver={() => setEdit(true)}
-      onMouseLeave={() => setEdit(false)}
+      onMouseOver={() => setReply(true)}
+      onMouseLeave={() => setReply(false)}
     >
       <div className="bg-sidebar w-fit p-4 rounded-lg md:max-w-[90%]">
         {message}
       </div>
-      {edit && (
-        <Pencil
+      {reply && (
+        <Reply
           className="w-4  ml-3 hover:text-foreground/60 cursor-pointer"
-          onClick={() => {}}
+          onClick={() => forwardMessage(message)}
         />
       )}
     </div>
@@ -39,10 +40,10 @@ function AssistantMessage({ message }: { message: string }) {
     </div>
   );
 }
-function scrollToBottom(element: RefObject<HTMLDivElement>) {
+function scrollToBottom(element: HTMLElement) {
   setTimeout(() => {
-    element.current?.scrollTo({
-      top: element.current.scrollHeight,
+    element.scrollTo({
+      top: element.scrollHeight,
       behavior: "smooth",
     });
   }, 0);
@@ -50,12 +51,12 @@ function scrollToBottom(element: RefObject<HTMLDivElement>) {
 
 function Chat({ className }: { className?: string }) {
   const messages = useCurrentChatStore((state) => state.messages);
-  const chatElement = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const unsubscribe = useCurrentChatStore.subscribe(
       (state) => state.messages.length,
       (currentLength, previousLength) => {
-        if (currentLength > previousLength) {
+        const chatElement = document.getElementById("chat");
+        if (currentLength > previousLength && chatElement) {
           scrollToBottom(chatElement);
         }
       }
@@ -64,7 +65,7 @@ function Chat({ className }: { className?: string }) {
   }, []);
 
   return (
-    <ScrollArea className={className} ref={chatElement}>
+    <ScrollArea className={className} id="chat">
       {messages.map((message, key) =>
         message.role === "system" ? null : message.role === "user" ? (
           <UserMessage message={message.content} key={key} />
